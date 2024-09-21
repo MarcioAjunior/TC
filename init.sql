@@ -19,5 +19,6 @@ CREATE TABLE lb_comments (
     at_insta BIGINT NULL,
     comment_text TEXT NULL,
     classification TEXT NULL,
+    verified_class BOOL NULL
     post_id TEXT NULL REFERENCES lb_posts(id) ON DELETE CASCADE
 );

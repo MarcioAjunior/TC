@@ -120,6 +120,7 @@ def fetch_comments(posts:list = []):
                         'at_insta' : raw_comment.get('created_at',''),
                         'comment_text' : comment_txt,
                         'classification' : '',
+                        'verified_class' : False,
                         'post_id' : id
                     }
 

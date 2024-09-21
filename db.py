@@ -49,8 +49,8 @@ def save_to_database(profile:dict = {},posts:list = [],comments:list = []):
         cursor.executemany(insert_posts_query, posts)
 
         insert_comments_query = """
-            INSERT INTO lb_comments (id, at_insta, comment_text, classification, post_id)
-            VALUES (%(id)s, %(at_insta)s, %(comment_text)s, %(classification)s, %(post_id)s)
+            INSERT INTO lb_comments (id, at_insta, comment_text, classification, verified_class, post_id)
+            VALUES (%(id)s, %(at_insta)s, %(comment_text)s, %(classification)s, %(verified_class)s, %(post_id)s)
         """
         cursor.executemany(insert_comments_query, comments)
 
