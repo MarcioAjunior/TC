@@ -1,66 +1,15 @@
 from fastapi import FastAPI, HTTPException
-import psycopg2
 from dotenv import load_dotenv
+from db import save_to_database
 import os
 import requests
 import emoji
 
-from mock import profile, posts,comments
+from mock_herik import profile, posts,comments
 
 load_dotenv()
 
 app = FastAPI()
-
-def get_db_connection():
-    
-    return psycopg2.connect(
-        dbname=os.getenv("DB_NAME"),
-        user=os.getenv("DB_USER"),
-        password=os.getenv("DB_PASSWORD"),
-        host=os.getenv("DB_HOST"),
-        port=os.getenv("DB_PORT")
-    )
-    
-def save_to_database(profile:dict = {},posts:list = [],comments:list = []):
-    
-    try:
-        conn = get_db_connection()
-        cursor = conn.cursor()
-    except Exception as e:
-        print(e)
-        raise HTTPException(status_code=500, detail="Erro ao conectar-se ao bando de dados !")
-    
-    try:
-        
-        cursor.execute("""
-            INSERT INTO lb_users (id, username, user_fullname, user_picture)
-            VALUES (%(id)s, %(username)s, %(user_fullname)s, %(user_picture)s)
-            ON CONFLICT (id) DO NOTHING
-        """, profile)
-
-        insert_posts_query = """
-            INSERT INTO lb_posts (id, at_insta, post_url, thumb_url, post_text, user_id)
-            VALUES (%(id)s, %(at_insta)s, %(post_url)s, %(thumb_url)s, %(post_text)s, %(user_id)s)
-        """
-        cursor.executemany(insert_posts_query, posts)
-
-        insert_comments_query = """
-            INSERT INTO lb_comments (id, at_insta, comment_text, classification, post_id)
-            VALUES (%(id)s, %(at_insta)s, %(comment_text)s, %(classification)s, %(post_id)s)
-        """
-        cursor.executemany(insert_comments_query, comments)
-
-        conn.commit()
-
-    except Exception as e:
-        print(e)
-        raise HTTPException(status_code=500, detail="Erro ao salvar dados no banco de dados !")
-    
-    finally:
-        cursor.close()
-        conn.close()
-    
-    return True
 
 def clean_comment_text(text: str) -> str:
     cleaned_text = emoji.replace_emoji(text, replace='')
@@ -191,8 +140,9 @@ def fetch_and_store(username: str):
 
     
     if save_to_database(profile, posts, comments):
-        return {"profile": profile, "posts": posts, "comments" : comments}
+        return  {"status": "success", "message": f"Dados do perfil {username} foram salvos com sucesso."}
+        #return {"profile": profile, "posts": posts, "comments" : comments}
 
     
-    #return  {"status": "success", "message": f"Dados do perfil {username} foram salvos."}
+    
 
