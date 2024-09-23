@@ -5,16 +5,32 @@ import os
 import requests
 import emoji
 
-from mock_herik import profile, posts,comments
+#from mock_aliexpress import profile, posts,comments
 
 load_dotenv()
 
 app = FastAPI()
 
+import emoji
+import re
+
+import emoji
+import re
+
 def clean_comment_text(text: str) -> str:
     cleaned_text = emoji.replace_emoji(text, replace='')
+
+    cleaned_text = re.sub(r'@\w+', '', cleaned_text)
+
+    cleaned_text = cleaned_text.replace('\n', ' ')
+
+    cleaned_text = re.sub(r'\s+', ' ', cleaned_text)
+
     cleaned_text = cleaned_text.strip()
+
     return cleaned_text
+
+
     
 def fetch_profile_posts(username:str = ''):
     
@@ -70,16 +86,10 @@ def fetch_profile_posts(username:str = ''):
 def fetch_comments(posts:list = []):
     
     comments = []
-    
-    print('POSTS')
-    print(posts)
-    
+        
     for post in posts:
         
         id = post['id']
-
-        print('ID DO POST')
-        print(id)
 
         params = {'code_or_id_or_url':id}
     
@@ -103,8 +113,10 @@ def fetch_comments(posts:list = []):
         
         raw_comments = data.get('data',{}).get('items', [])
         
-        if len(raw_comments) > 10:
-            raw_comments = raw_comments[:10]
+        number_of_comments = int(os.getenv("NUMBER_OF_COMMENTS"))
+        
+        if len(raw_comments) > number_of_comments:
+            raw_comments = raw_comments[:number_of_comments]
         
         for raw_comment in raw_comments:
             
@@ -131,18 +143,18 @@ def fetch_comments(posts:list = []):
 @app.get("/fetch/{username}")
 def fetch_and_store(username: str):
         
-    #profile, posts = fetch_profile_posts(username)        
+    profile, posts = fetch_profile_posts(username)        
     
     print('--------------------------------------')
 
-    #comments = fetch_comments(posts)
+    comments = fetch_comments(posts)
 
     print('--------------------------------------')
 
     
     if save_to_database(profile, posts, comments):
-        return  {"status": "success", "message": f"Dados do perfil {username} foram salvos com sucesso."}
-        #return {"profile": profile, "posts": posts, "comments" : comments}
+        #return  {"status": "success", "message": f"Dados do perfil {username} foram salvos com sucesso."}
+        return {"profile": profile, "posts": posts, "comments" : comments}
 
     
     
