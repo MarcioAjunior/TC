@@ -1,3 +1,4 @@
 /data
 /venv
 /.env
+/utils/best_model.pkl

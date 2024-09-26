@@ -4,6 +4,11 @@ import psycopg2
 import os
 
 def get_db_connection():
+    """Função que retorna a conexão com o banco de dados
+
+    Returns:
+        connection: Conexão com o DB
+    """
     load_dotenv()
     return psycopg2.connect(
         dbname=os.getenv("DB_NAME"),
@@ -14,7 +19,6 @@ def get_db_connection():
     )
     
 def save_to_database(profile:dict = {},posts:list = [],comments:list = []):
-    
     try:
         conn = get_db_connection()
         cursor = conn.cursor()

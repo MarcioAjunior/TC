@@ -1,6 +1,6 @@
 import requests
 import time
-from perfiis_utilizados_para_treino import NOMES
+from utils.perfiis_utilizados_para_treino import NOMES
 
 BASE_URL = 'http://127.0.0.1:8000/fetch/'
 
