@@ -1,6 +1,6 @@
 import os
 import requests
-from app_utils.clean_comment import clean_comment_text
+from utils.clean_comment import clean_comment_text
 from fastapi import HTTPException
 import joblib
 
@@ -60,7 +60,7 @@ def fetch_comments(posts:list = [], is_classification = True):
     
     comments = []
     
-    if len(post) > 0:
+    if len(posts) > 0:
         
         model = joblib.load(os.path.join(os.path.dirname(__file__), 'best_model.pkl'))
             

@@ -1,6 +1,5 @@
 from fastapi import FastAPI
-from app_utils.db import save_to_database
-from api.utils.rapidapi import fetch_profile_posts, fetch_comments
+from utils import fetch_profile_posts, fetch_comments, save_to_database
 from dotenv import load_dotenv
 import os
 
