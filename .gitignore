@@ -2,3 +2,4 @@
 /venv
 /api/.env
 /utils/best_model.pkla
+/api/venv

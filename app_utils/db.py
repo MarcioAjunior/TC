@@ -41,8 +41,8 @@ def save_to_database(profile:dict = {},posts:list = [],comments:list = []):
             print(f"Atualizado usuario {profile['id']}")
         
         cursor.execute("""
-            INSERT INTO lb_users (id, username, user_fullname, user_picture)
-            VALUES (%(id)s, %(username)s, %(user_fullname)s, %(user_picture)s)
+            INSERT INTO lb_users (id, username, user_fullname, user_picture, is_training)
+            VALUES (%(id)s, %(username)s, %(user_fullname)s, %(user_picture)s, %(is_training)s)
             ON CONFLICT (id) DO NOTHING
         """, profile)
 

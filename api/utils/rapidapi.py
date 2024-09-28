@@ -1,11 +1,10 @@
 import os
 import requests
-from ...utils.clean_comment import clean_comment_text
+from app_utils.clean_comment import clean_comment_text
 from fastapi import HTTPException
 import joblib
 
-
-def fetch_profile_posts(username:str = ''):
+def fetch_profile_posts(username:str = '', is_traning = False):
     
     params = {'username_or_id_or_url':username}
     
@@ -23,12 +22,13 @@ def fetch_profile_posts(username:str = ''):
     data = r.json()
     
     id = data.get('data', {}).get('user',{}).get('id','')
-    
+
     profile = {
         'id' : id, 
         'username' : username, 
         'user_fullname' : data.get('data', {}).get('user',{}).get('full_name',''),
-        'user_picture' : data.get('data', {}).get('user',{}).get('profile_pic_url','')
+        'user_picture' : data.get('data', {}).get('user',{}).get('profile_pic_url',''),
+        'is_training' : is_traning
     } 
     
     raw_posts = data.get('data', {}).get('items',[])
@@ -56,74 +56,88 @@ def fetch_profile_posts(username:str = ''):
         
     return profile, posts
 
-def fetch_comments(posts:list = []):
-    
-    model = joblib.load('./utils/best_model.pkl')
+def fetch_comments(posts:list = [], is_classification = True):
     
     comments = []
-        
-    for post in posts:
-        
-        id = post['id']
-
-        params = {'code_or_id_or_url':id}
     
-        headers = {
-                'x-rapidapi-host' : 'instagram-scraper-api2.p.rapidapi.com',
-                'x-rapidapi-key': os.getenv("RAPID_API_KEY")
+    if len(post) > 0:
+        
+        model = joblib.load(os.path.join(os.path.dirname(__file__), 'best_model.pkl'))
+            
+        for post in posts:
+            
+            id = post['id']
+
+            params = {
+                'code_or_id_or_url':id,
+                'sort_by':'popular'
                 }
-    
-        r = requests.get('https://instagram-scraper-api2.p.rapidapi.com/v1/comments', params=params, headers=headers)
         
-        if r.status_code == 404:
-            raise HTTPException(status_code=500, detail="Comentários não localizado")
-        if r.status_code == 403:
-            continue
-        
-        r.raise_for_status()    
-        data = r.json()
-        
-        if data.get('data',{}).get('items', []) is None:
-            continue
-        
-        raw_comments = data.get('data',{}).get('items', [])
-        
-        number_of_comments = int(os.getenv("NUMBER_OF_COMMENTS"))
-        
-        if len(raw_comments) > number_of_comments:
-            raw_comments = raw_comments[:number_of_comments]
-        
-        for raw_comment in raw_comments:
-            
-            comment_txt = ''
-            
-            if raw_comment.get('type','') != 2:
-                
-                comment_txt = clean_comment_text(raw_comment.get('text',''))
-                
-                if comment_txt != '':
-                    
-                    #Consulta ao modelo
-                    try :
-                        vectorizer = model.named_steps['tfidf']
-                        naivebayes = model.named_steps['naivebayes']
-                        comment_vec = vectorizer.transform([comment_txt])
-
-                        predictions = naivebayes.predict(comment_vec)
-                        classification = str(predictions[0])
-                    except Exception as e:
-                        print(e)
-                        classification = ''
-                    
-                    comment = {
-                        'id' : raw_comment.get('id',''),
-                        'at_insta' : raw_comment.get('created_at',''),
-                        'comment_text' : comment_txt,
-                        'classification' : classification,
-                        'verified_class' : False,
-                        'post_id' : id
+            headers = {
+                    'x-rapidapi-host' : 'instagram-scraper-api2.p.rapidapi.com',
+                    'x-rapidapi-key': os.getenv("RAPID_API_KEY")
                     }
+        
+            r = requests.get('https://instagram-scraper-api2.p.rapidapi.com/v1/comments', params=params, headers=headers)
+            
+            if r.status_code == 404:
+                raise HTTPException(status_code=500, detail="Comentários não localizado")
+            if r.status_code == 403:
+                continue #forbiden
+            
+            r.raise_for_status()    
+            data = r.json()
+            
+            if data.get('data',{}).get('items', []) is None:
+                continue
+            
+            raw_comments = data.get('data',{}).get('items', [])
+            
+            number_of_comments = int(os.getenv("NUMBER_OF_COMMENTS"))
+            
+            if len(raw_comments) > number_of_comments:
+                raw_comments = raw_comments[:number_of_comments]
+            
+            for raw_comment in raw_comments:
+                
+                comment_txt = ''
+                
+                if raw_comment.get('type','') != 2: #verify
+                    
+                    comment_txt = clean_comment_text(raw_comment.get('text',''))
+                    
+                    if comment_txt != '':
+                        
+                        classification = ''
+                        
+                        if is_classification:
+                            #Consulta ao modelo
+                            try :
+                                vectorizer = model.named_steps['tfidf']
+                                naivebayes = model.named_steps['naivebayes']
+                                comment_vec = vectorizer.transform([comment_txt])
 
-                    comments.append(comment)
+                                predictions = naivebayes.predict(comment_vec)
+                                
+                                if str(predictions[0]) == '2': 
+                                    classification = 'BOM'
+                                elif str(predictions[0]) == '1':    
+                                    classification = 'NEUTRO'
+                                elif str(predictions[0]) == '0':
+                                    classification = 'RUIM'
+                                    
+                            except Exception as e:
+                                print(e)
+                            
+                        comment = {
+                            'id' : raw_comment.get('id',''),
+                            'at_insta' : raw_comment.get('created_at',''),
+                            'comment_text' : comment_txt,
+                            'classification' : classification,
+                            'verified_class' : False,
+                            'post_id' : id
+                        }
+
+                        comments.append(comment)
                 
     return comments
