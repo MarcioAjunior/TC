@@ -1,6 +1,6 @@
 import os
 import requests
-from .clean_comment import clean_comment_text
+from ...utils.clean_comment import clean_comment_text
 from fastapi import HTTPException
 import joblib
 

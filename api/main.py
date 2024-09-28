@@ -14,6 +14,3 @@ def fetch_and_store(username: str):
     if save_to_database(profile, posts, comments):
         return  {"status": "success", "message": f"Dados do perfil {username} foram salvos com sucesso."}
         
-    
-    
-

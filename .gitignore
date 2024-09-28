@@ -1,4 +1,4 @@
-/data
+/db/data
 /venv
-/.env
-/utils/best_model.pkl
+/api/.env
+/utils/best_model.pkla

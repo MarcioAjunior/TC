@@ -1,8 +1,20 @@
 import requests
 import time
-from utils.perfiis_utilizados_para_treino import NOMES
 
 BASE_URL = 'http://127.0.0.1:8000/fetch/'
+
+NOMES = [
+        'mercadolivre',
+        'nike',
+        'adidasbrasil',
+        'sheinbrasil',
+        'amazonbrasil',
+        'magazineluiza',
+        'instadonext',
+        'nubank',
+        'shopee_br',
+        'olxbr'
+    ]
 
 def requester(param):
     try:
