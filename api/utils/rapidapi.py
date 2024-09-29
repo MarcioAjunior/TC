@@ -107,29 +107,22 @@ def fetch_comments(posts:list = [], is_classification = True):
                     
                     comment_txt = clean_comment_text(raw_comment.get('text',''))
                     #comment_txt = 'TEXTO'
-                    
-                    print('A', comment_txt)
-                    
+                                        
                     if comment_txt != '':
                         
                         classification = ''
                         
                         if is_classification:
-                            try :
-                                print('B','before')                                
+                            try :                         
                                 vectorizer = model.named_steps['tfidf']
                                 classifier  = model.named_steps['logisticregression']
-                                
-                                print('C',classifier)
-                                
+                                                                
                                 comment_vec = vectorizer.transform([comment_txt])
                                 probabilities = classifier.predict_proba(comment_vec)
                                 
                                 max_prob = float(max(probabilities[0]))
                                 pred_class = classifier.classes_[probabilities[0].argmax()]
-                              
-                                print('D',max_prob)
-                              
+                                                            
                                 if max_prob < threshold:
                                     classification = 'NEUTRO'
                                 else:
