@@ -3,3 +3,4 @@
 /api/.env
 /utils/best_model.pkla
 /api/venv
+/node_modules

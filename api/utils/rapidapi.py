@@ -62,6 +62,7 @@ def fetch_comments(posts:list = [], is_classification = True):
     
     if len(posts) > 0:
         
+        threshold = float(os.getenv("THRESHOLD"))
         model = joblib.load(os.path.join(os.path.dirname(__file__), 'best_model.pkl'))
             
         for post in posts:
@@ -97,7 +98,7 @@ def fetch_comments(posts:list = [], is_classification = True):
             
             if len(raw_comments) > number_of_comments:
                 raw_comments = raw_comments[:number_of_comments]
-            
+
             for raw_comment in raw_comments:
                 
                 comment_txt = ''
@@ -105,29 +106,43 @@ def fetch_comments(posts:list = [], is_classification = True):
                 if raw_comment.get('type','') != 2: #verify
                     
                     comment_txt = clean_comment_text(raw_comment.get('text',''))
+                    #comment_txt = 'TEXTO'
+                    
+                    print('A', comment_txt)
                     
                     if comment_txt != '':
                         
                         classification = ''
                         
                         if is_classification:
-                            #Consulta ao modelo
                             try :
+                                print('B','before')                                
                                 vectorizer = model.named_steps['tfidf']
-                                naivebayes = model.named_steps['naivebayes']
-                                comment_vec = vectorizer.transform([comment_txt])
-
-                                predictions = naivebayes.predict(comment_vec)
+                                classifier  = model.named_steps['logisticregression']
                                 
-                                if str(predictions[0]) == '2': 
-                                    classification = 'BOM'
-                                elif str(predictions[0]) == '1':    
+                                print('C',classifier)
+                                
+                                comment_vec = vectorizer.transform([comment_txt])
+                                probabilities = classifier.predict_proba(comment_vec)
+                                
+                                max_prob = float(max(probabilities[0]))
+                                pred_class = classifier.classes_[probabilities[0].argmax()]
+                              
+                                print('D',max_prob)
+                              
+                                if max_prob < threshold:
                                     classification = 'NEUTRO'
-                                elif str(predictions[0]) == '0':
-                                    classification = 'RUIM'
+                                else:
+                                    if pred_class == 1:
+                                        classification = 'BOM'
+                                    elif pred_class == 0:
+                                        classification = 'RUIM'
+                                    else :
+                                        classification = 'NEUTRO'
                                     
                             except Exception as e:
                                 print(e)
+                            
                             
                         comment = {
                             'id' : raw_comment.get('id',''),
