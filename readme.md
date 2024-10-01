@@ -53,13 +53,39 @@ De forma simplificado, é realizado um pré processameto dos comentários coleta
 
 Este parte do projeto é um banco relacional que armaza algumas informações coletadas pela API (API de Consulta ao Modelo), é também é usado pela api que apresenda os dados no dashboar, sendo que a única forma de inserção de dados para o banco é feita pela api pelas rotas **/fetch_training/{username}** e **/fetch/{username}**, para dados de treinamento e dados para classificação respectivamente.
 
+O DER do banco utilizado para este projeto fica conforme imagem abaixo.
+
+![Arquitetura do projeto](assets/der.png)
+
 ### 4. Dashboard
 
 O Dashborar do projeto é uma aplicação simple, que se limita a mostrar os perfis buscados, com seus posts e comentários, mostrado a classificação resultante do modelo. O Dashboard permite também a requisição de um novo perfil ao modelo utilizando uma simples barra de pesquisa.
 
 
-Baixo segue uma imagem referente a arquitetura proposta:
+### ABaixo segue uma imagem referente a arquitetura proposta:
 
 ![Arquitetura do projeto](assets/TC3_drawio.png)
 
 
+## Como o projeto esta dividido.
+
+
+### app
+
+A pasta app do projeto contem apenas o dashboard, e pode ser intalada conforme instruçãoes do readme da própria pasta.
+
+### api
+
+A pasta api contem o desenvolvimento da api com as rotas de treinamento e utilização do modelo, é possivel instala-la instalando as dependencias de requiriments.txt em uma virtualenv.
+
+### db
+
+A pasta db tem o DDL usado para inciar um conteiner postgres que foi utilizado no projeto. Uma vez que o banco estiver configurado é possivel criar um banco zerado com o DDL fornecido.
+
+### notebooks (sklearn_model_2_class e sklearn_model_3_class)
+
+Os dois notebooks contem estudos exploratórios, e é possível extrair deles um modelo, que para ser usado pela API precisa fornecer um .plk no diretório de utils da api "./api/utils/best_model.pkl"
+
+### docker-compose
+
+Com a pasta api instalada, com a pasta app e a pasta db é possível iniciar a aplicação com todos os recurso, orquestrando os container utilizar o arquiv docker-compose na raiz do projeto.
