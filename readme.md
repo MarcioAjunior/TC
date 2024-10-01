@@ -57,3 +57,9 @@ Este parte do projeto é um banco relacional que armaza algumas informações co
 
 O Dashborar do projeto é uma aplicação simple, que se limita a mostrar os perfis buscados, com seus posts e comentários, mostrado a classificação resultante do modelo. O Dashboard permite também a requisição de um novo perfil ao modelo utilizando uma simples barra de pesquisa.
 
+
+Baixo segue uma imagem referente a arquitetura proposta:
+
+![Arquitetura do projeto](assets/TC3_drawio.png)
+
+
