@@ -2,8 +2,17 @@ from fastapi import FastAPI
 from utils import fetch_profile_posts, fetch_comments, save_to_database
 from dotenv import load_dotenv
 import os
+from fastapi.middleware.cors import CORSMiddleware
 
 app = FastAPI()
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_credentials=True,
+    allow_methods=["*"], 
+    allow_headers=["*"],
+)
 
 load_dotenv(os.path.join(os.path.dirname(__file__), '.env'))
 
@@ -26,6 +35,6 @@ def fetch_and_training(username: str):
     comments = fetch_comments(posts, is_classification=False)
     
     if save_to_database(profile, posts, comments):
-        return {'profile' : profile, 'posts' : posts, 'comments' : comments}
-        #return  {"status": "success", "message": f"Dados do perfil {username} foram salvos como dados para treinamento."}
+        #return {'profile' : profile, 'posts' : posts, 'comments' : comments}
+        return  {"status": "success", "message": f"Dados do perfil {username} foram salvos como dados para treinamento."}
         

@@ -1,0 +1,44 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = "postgresql://user:password@127.0.0.1:5434/bd"
+}
+
+model lb_users {
+  id             String   @id @map("id") @db.Text
+  username       String?  @db.Text
+  user_fullname  String?  @map("user_fullname") @db.Text
+  user_picture   String?  @map("user_picture") @db.Text
+  is_training     Boolean? @map("is_training")
+  updated_at     DateTime @default(now()) @map("updated_at")
+
+  posts         lb_posts[]   @relation("UserPosts")
+}
+
+model lb_posts {
+  id        String   @id @map("id") @db.Text
+  at_insta  BigInt?  @map("at_insta")
+  post_url  String?  @map("post_url") @db.Text
+  thumb_url String?  @map("thumb_url") @db.Text
+  post_text String?  @map("post_text") @db.Text
+  user_id   String?  @map("user_id") @db.Text
+
+  user      lb_users?    @relation("UserPosts", fields: [user_id], references: [id])
+  comments   lb_comments[] @relation("PostComments")
+}
+
+model lb_comments {
+  id              String   @id @map("id") @db.Text
+  at_insta        BigInt?  @map("at_insta")
+  comment_text    String?  @map("comment_text") @db.Text
+  classification  String?  @map("classification") @db.Text
+  verified_class   Boolean? @map("verified_class")
+  is_correct_class Boolean? @map("is_correct_class")
+  correct_class   String?  @map("correct_class") @db.Text
+  post_id         String?  @map("post_id") @db.Text
+
+  post            lb_posts?    @relation("PostComments", fields: [post_id], references: [id])
+}

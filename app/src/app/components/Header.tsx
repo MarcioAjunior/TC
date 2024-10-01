@@ -11,16 +11,6 @@ const Header: React.FC = () => {
             Dashboard
           </Link>
         </h1>
-
-        <nav>
-          <ul className="flex space-x-4">
-            <li>
-              <Link href="/metrics">
-                <span className="hover:text-[#7890a8]">Métricas</span>
-              </Link>
-            </li>
-          </ul>
-        </nav>
       </div>
     </header>
   );

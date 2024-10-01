@@ -3,7 +3,8 @@ CREATE TABLE lb_users (
     username TEXT NULL,
     user_fullname TEXT NULL,
     user_picture TEXT NULL,
-    is_training BOOL NULL
+    is_training BOOL NULL,
+    updated_at timestamp NULL DEFAULT now()
 );
 
 CREATE TABLE lb_posts (
